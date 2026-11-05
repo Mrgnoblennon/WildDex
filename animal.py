@@ -6,6 +6,7 @@ class Animal:
     self.name = name
     self.scientific_name = scientific_name
     self.rank = rank
-
+  
   def get_info(self):
     return f"{self.name}, {self.scientific_name}, {self.rank}"
+  
