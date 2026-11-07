@@ -11,11 +11,11 @@ url = "https://api.inaturalist.org/v1/observations"
 # added arguments to change data retrieval
 params = {
     "taxon_id": 1,
-    "per_page": 50,
+    "per_page": 200,
     # perth co-ordinates
-    "lat": -31.95,
-    "lng": 115.86,
-    "radius": 20,
+    "lat": -32,
+    "lng": 115.50,
+    "radius": 7,
 }
 
 # try, except and finally are used for error handling, tries to prevent program crashes
@@ -34,13 +34,13 @@ try:
     print("----------------------------------")
     # iterate through data specifically the 'results' array and find the following data
     for result in data["results"]:
-        # dont print blank or none entries
-        if result["species_guess"] is not None:
+        # dont print blank or none entries as well as empty taxon data
+        if result["species_guess"] is not None and result.get("taxon") is not None:
             # the following lines of code are set to grab specified data 
             print()
             # navigating through a returned api data object is insane, names like species guest and taxon are tough
             new_animal = Animal(result.get("species_guess"), result["taxon"]["name"], result["taxon"]["rank"])
-            new_observation = Observation(new_animal, result["user"]["login"], {result.get("observed_on")}, {result.get("place_guess")})
+            new_observation = Observation(new_animal, result["user"]["login"], result.get("observed_on"), result.get("place_guess"))
 
             observations.append(new_observation)
 
@@ -68,16 +68,13 @@ try:
             highest_count = species_count[animal_count]
             highest_name = animal_count
 
-
     print(f"There have mostly been sightings of {highest_name} | sighted: {highest_count}")
-        
 
-
-    count = 0
+    count = species_count.get("Quokka", 0)
 
     # because the observations list isnt empty, count assigned to correct no found 
     if count == 0:
-        print("There aren't any recent sightings of this animal.")
+        print(f"There aren't any recent sightings of Quokka in the area.")
     else:
         print(f"Quokka sightings found: {count}")
             
