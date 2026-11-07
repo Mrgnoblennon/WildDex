@@ -46,7 +46,41 @@ try:
 
     print("----------------------------------")
 
+    species_count = {}
+    # i want observations based on chosen animal name
+    
+    for observation in observations:
+        name = observation.animal.name
 
+        if name in species_count:
+            # increase existing animal count
+            species_count[name] += 1
+        else:
+            # if animal not established yet add it then set its count to 1
+            species_count[name] = 1
+    
+    # print animal species counts and highest animal count
+    highest_count = 0
+    highest_name = ""
+    for animal_count in species_count:
+        print(f"Species: {animal_count} | Sightings: {species_count[animal_count]}")
+        if species_count[animal_count] > highest_count:
+            highest_count = species_count[animal_count]
+            highest_name = animal_count
+
+
+    print(f"There have mostly been sightings of {highest_name} | sighted: {highest_count}")
+        
+
+
+    count = 0
+
+    # because the observations list isnt empty, count assigned to correct no found 
+    if count == 0:
+        print("There aren't any recent sightings of this animal.")
+    else:
+        print(f"Quokka sightings found: {count}")
+            
 # any errors? except will try to resolve
 except requests.exceptions.RequestException:
     print("Connection or API error")
