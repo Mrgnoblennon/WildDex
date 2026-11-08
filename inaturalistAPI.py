@@ -1,5 +1,5 @@
 # library imports
-import requests
+import requests, folium
 
 # import my local classes
 from animal import Animal
@@ -12,7 +12,7 @@ url = "https://api.inaturalist.org/v1/observations"
 params = {
     "taxon_id": 1,
     "per_page": 200,
-    # perth co-ordinates
+    # rotto co-ordinates
     "lat": -32,
     "lng": 115.50,
     "radius": 7,
@@ -47,18 +47,45 @@ try:
             print()
             # navigating through a returned api data object is insane, names like species guest and taxon are tough
             new_animal = Animal(result.get("species_guess"), result["taxon"]["name"], result["taxon"]["rank"])
-            new_observation = Observation(new_animal, result["user"]["login"], result.get("observed_on"), result.get("place_guess"), latitude, longitude)
+
+            # store observation photos in list
+            image_urls = []
+
+            for photo in result["photos"]:
+                image_url = photo["url"].replace("square", "large")
+                image_urls.append(image_url)
+            # 
+            new_observation = Observation(new_animal, result["user"]["login"], result.get("observed_on"), result.get("place_guess"), latitude, longitude, image_urls)
 
             observations.append(new_observation)
+
+    # import map class
+    map = folium.Map(
+        location=[-32, 115.50],
+        zoom_start=11
+    )
+
+    # plot each animals markers on a map and images
+    for observation in observations:
+        
+        popup = f"<b>{observation.animal.name}</b>"
+
+        if observation.image_urls:
+            popup += f'<p><img src="{observation.image_urls[0]}" width="200"></p>'
+        folium.Marker(
+            location=[observation.latitude, observation.longitude],
+            # allow html to have animal name and photo as a popup
+            popup=folium.Popup(popup, max_width=250)
+        ).add_to(map)
+      
     print("----------------------------------")
 
+    # save html file every execution
+    map.save("wilddex_map.html")  
 
     # check if process worked. remove when done
     for observation in observations:
         print(f"Name: {observation.animal.name} | Lat: {observation.latitude}, Long: {observation.longitude}")
-
-
-
 
     species_count = {}
     # i want observations based on chosen animal name
@@ -102,6 +129,7 @@ try:
         print(f"There aren't any recent sightings of {search_name} in the area.")
     else:
         print(f"{search_name} sightings found: {count}")
+
             
 # any errors? except will try to resolve
 except requests.exceptions.RequestException:
