@@ -48,9 +48,9 @@ try:
 
     species_count = {}
     # i want observations based on chosen animal name
-    
     for observation in observations:
-        name = observation.animal.name
+        # makes searches more consistent
+        name = observation.animal.name.lower()
 
         if name in species_count:
             # increase existing animal count
@@ -62,6 +62,8 @@ try:
     # print animal species counts and highest animal count
     highest_count = 0
     highest_name = ""
+
+    # check for animal who's count is highest by name
     for animal_count in species_count:
         print(f"Species: {animal_count} | Sightings: {species_count[animal_count]}")
         if species_count[animal_count] > highest_count:
@@ -70,13 +72,19 @@ try:
 
     print(f"There have mostly been sightings of {highest_name} | sighted: {highest_count}")
 
-    count = species_count.get("Quokka", 0)
+    # remove white space and lowercase the user input
+    search_name = input("What animal are you searching for? ").strip().lower()
+
+    search_name.lower()
+
+    # get user input, retrive key from the species count dictionary with value, 
+    count = species_count.get(search_name, 0)
 
     # because the observations list isnt empty, count assigned to correct no found 
     if count == 0:
-        print(f"There aren't any recent sightings of Quokka in the area.")
+        print(f"There aren't any recent sightings of {search_name} in the area.")
     else:
-        print(f"Quokka sightings found: {count}")
+        print(f"{search_name} sightings found: {count}")
             
 # any errors? except will try to resolve
 except requests.exceptions.RequestException:
