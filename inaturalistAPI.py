@@ -46,7 +46,7 @@ try:
             # the following lines of code are set to grab specified data 
             print()
             # navigating through a returned api data object is insane, names like species guest and taxon are tough
-            new_animal = Animal(result.get("species_guess"), result["taxon"]["name"], result["taxon"]["rank"])
+            new_animal = Animal(result["taxon"]["id"], result.get("species_guess"), result["taxon"]["name"], result["taxon"]["rank"])
 
             # store observation photos in list
             image_urls = []
@@ -85,7 +85,7 @@ try:
 
     # check if process worked. remove when done
     for observation in observations:
-        print(f"Name: {observation.animal.name} | Lat: {observation.latitude}, Long: {observation.longitude}")
+        print(f"ID: {observation.animal.id}, Name: {observation.animal.name} | Lat: {observation.latitude}, Long: {observation.longitude}")
 
     species_count = {}
     # i want observations based on chosen animal name
