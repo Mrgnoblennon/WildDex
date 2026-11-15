@@ -12,5 +12,5 @@ class Observation:
     
   # give back above data
   def get_info(self):
-    return f"{self.animal.name}, {self.observer}, {self.date}, {self.location}, {self.latitude}, {self.longitude}, {self.image_urls}"
+    return f" {self.animal.id}, {self.animal.name}, {self.observer}, {self.date}, {self.location}, {self.latitude}, {self.longitude}, {self.image_urls}"
   
