@@ -22,7 +22,7 @@ from animal import Animal
 # create player
 player = Player("Chase")
 
-# create Rottnest animals
+# create animals
 quokka = Animal(123, "Quokka", "Setonix brachyurus", "species")
 dugite = Animal(456, "Rottnest Island Dugite", "Pseudonaja affinis", "species")
 tern = Animal(789, "Crested Tern", "Thalasseus bergii", "species")

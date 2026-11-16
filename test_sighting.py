@@ -93,7 +93,7 @@ for sighting in sightings.values():
 
 # save all sightings to JSON
 with open("sightings.json", "w") as file:
-    json.dump(sightings_data, file, indent=4)
+    json.dump(sightings_data, file, indent=2)
 
 # load saved sightings from JSON
 with open("sightings.json", "r") as file:
