@@ -1,9 +1,9 @@
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, send_file
 from animal import Animal
 from sighting import Sighting
 from player import Player
-import json
+import json, os
 
 app = Flask(__name__)
 
@@ -95,6 +95,14 @@ def view_sightings():
         sightings=sightings
     )
 
+@app.route("/map")
+def wildlife_map():
+    map_file = os.path.join(app.root_path, "wilddex_map.html")
+
+    if not os.path.exists(map_file):
+        return "Map not found. Run inaturalistAPI.py first.", 404
+
+    return send_file(map_file)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
