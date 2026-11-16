@@ -23,6 +23,17 @@ def profile():
     sightings=sightings
 )
 
+@app.route("/sightings")
+def view_sightings():
+    # load saved sightings
+    with open("sightings.json", "r") as file:
+        saved_sightings = json.load(file)
+
+    return render_template(
+        "sightings.html",
+        sightings=saved_sightings
+    )
+
 
 # start Flask
 if __name__ == "__main__":

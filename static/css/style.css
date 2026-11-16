@@ -1,3 +1,6 @@
+
+/* WILDDEX - SHARED ARCADE THEME */
+
 :root {
   --green: #70df78;
   --dark: #182b35;
@@ -18,7 +21,8 @@ body {
   color: var(--dark);
 }
 
-/* arcade-style header */
+/* HEADER AND NAVIGATION */
+
 header {
   background: var(--dark);
   color: white;
@@ -34,14 +38,46 @@ header h1 {
   text-shadow: 3px 3px #000;
 }
 
-/* main profile container */
+header nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+header nav a {
+  background: var(--cream);
+  color: var(--dark);
+  padding: 10px 16px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 900;
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 3px 3px 0 #000;
+  transition: transform 0.2s;
+}
+
+header nav a:hover {
+  transform: translateY(-3px);
+  background: var(--yellow);
+}
+
+header nav a.active {
+  background: var(--green);
+}
+
+/* MAIN CONTAINER */
+
 .container {
   max-width: 850px;
   margin: 35px auto;
   padding: 15px;
 }
 
-/* chunky arcade cards */
+/* SHARED ARCADE CARDS */
+
 .card {
   background: var(--cream);
   border: 4px solid var(--border);
@@ -50,6 +86,13 @@ header h1 {
   margin-bottom: 20px;
   box-shadow: 6px 6px 0 var(--border);
 }
+
+h2 {
+  margin-top: 0;
+  font-size: 22px;
+}
+
+/* PROFILE */
 
 .profile-top {
   display: flex;
@@ -66,6 +109,7 @@ header h1 {
   display: grid;
   place-items: center;
   font-size: 50px;
+  flex-shrink: 0;
 }
 
 .username {
@@ -83,7 +127,8 @@ header h1 {
   font-weight: bold;
 }
 
-/* XP progress bar */
+/* XP PROGRESS BAR */
+
 .xp-title {
   display: flex;
   justify-content: space-between;
@@ -105,7 +150,8 @@ header h1 {
   background: var(--yellow);
 }
 
-/* player statistics */
+/* PLAYER STATISTICS */
+
 .stats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -135,7 +181,8 @@ header h1 {
   margin-top: 5px;
 }
 
-/* discovery cards */
+/* PROFILE DISCOVERIES */
+
 .discoveries {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -156,10 +203,212 @@ header h1 {
   margin-bottom: 10px;
 }
 
-h2 {
-  margin-top: 0;
-  font-size: 22px;
+/* SIGHTINGS PAGE HEADING */
+
+.page-heading {
+  text-align: center;
+  margin-bottom: 30px;
 }
+
+.page-heading h1 {
+  font-size: 38px;
+  font-weight: 900;
+  margin: 10px 0;
+  text-shadow: 3px 3px var(--yellow);
+}
+
+.page-heading p {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+/* SIGHTINGS STATS BANNER */
+
+.stats-banner {
+  background: var(--blue);
+  border: 4px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 6px 6px 0 var(--border);
+  padding: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px;
+}
+
+.stats-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.stats-banner strong {
+  display: block;
+  font-size: 45px;
+  font-weight: 900;
+  margin-top: 5px;
+}
+
+.stats-icon {
+  font-size: 55px;
+}
+
+/* SIGHTINGS SECTION HEADING */
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.section-heading h2 {
+  margin: 0;
+}
+
+.count {
+  background: var(--yellow);
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+/* SIGHTINGS GRID */
+
+.sightings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+.sighting-card {
+  background: var(--cream);
+  border: 4px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 6px 6px 0 var(--border);
+  transition: transform 0.2s;
+}
+
+.sighting-card:hover {
+  transform: translateY(-5px);
+}
+
+/* SIGHTING IMAGE */
+
+.card-image {
+  height: 190px;
+  background: var(--green);
+  border-bottom: 4px solid var(--border);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.animal-placeholder {
+  font-size: 80px;
+}
+
+.discovered-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--yellow);
+  border: 3px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 10px;
+  font-weight: 900;
+  transform: rotate(4deg);
+}
+
+/* SIGHTING INFORMATION */
+
+.card-content {
+  padding: 18px;
+}
+
+.card-content h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.scientific-name {
+  font-size: 13px;
+  font-style: italic;
+  margin: 6px 0 18px;
+  opacity: 0.7;
+}
+
+.sighting-details {
+  background: white;
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.sighting-details p {
+  font-size: 12px;
+  margin: 7px 0;
+  overflow-wrap: anywhere;
+}
+
+.notes {
+  margin-top: 15px;
+  padding: 12px;
+  background: #fff0b3;
+  border-left: 5px solid var(--yellow);
+  border-radius: 5px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 2px solid #d8d5c5;
+  margin-top: 18px;
+  padding-top: 14px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+/* EMPTY SIGHTINGS */
+
+.empty-state {
+  grid-column: 1 / -1;
+  background: var(--cream);
+  border: 4px dashed var(--border);
+  border-radius: 18px;
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 60px;
+}
+
+/* MOBILE RESPONSIVENESS */
 
 @media (max-width: 500px) {
   .profile-top {
@@ -168,7 +417,7 @@ h2 {
   }
 
   .stats {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, 1fr);
   }
 
   .discoveries {
@@ -177,5 +426,120 @@ h2 {
 
   .username {
       font-size: 25px;
+  }
+
+  .page-heading h1 {
+      font-size: 30px;
+  }
+
+  .stats-banner {
+      padding: 18px;
+  }
+
+  .stats-banner strong {
+      font-size: 36px;
+  }
+
+  .stats-icon {
+      font-size: 40px;
+  }
+
+  .sightings-grid {
+      grid-template-columns: 1fr;
+  }
+
+  header nav a {
+      padding: 8px 10px;
+      font-size: 11px;
+  }
+}
+
+
+/* Sighting form */
+
+.sighting-form-section {
+  margin-bottom: 35px;
+}
+
+.sighting-form-section > p {
+  margin-bottom: 25px;
+}
+
+.sighting-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  background: white;
+  color: var(--dark);
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  padding: 13px;
+  font: inherit;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #269e51;
+  box-shadow: 3px 3px 0 var(--green);
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.submit-btn {
+  background: var(--yellow);
+  color: var(--dark);
+  border: 4px solid var(--border);
+  border-radius: 12px;
+  padding: 15px 25px;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 5px 5px 0 var(--border);
+  transition: transform 0.2s;
+}
+
+.submit-btn:hover {
+  background: var(--green);
+  transform: translateY(-3px);
+}
+
+.submit-btn:active {
+  transform: translateY(2px);
+  box-shadow: 2px 2px 0 var(--border);
+}
+
+@media (max-width: 500px) {
+  .form-row {
+      grid-template-columns: 1fr;
+  }
+
+  .submit-btn {
+      width: 100%;
   }
 }

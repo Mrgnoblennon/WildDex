@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Sightings | WildDex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header>
+    <h1>🌿 WILDDEX</h1>
+    <nav>
+        <a href="/">PROFILE</a>
+        <a href="/map">MAP</a>
+        <a href="/sightings" class="active">SIGHTINGS</a>
+    </nav>
+</header>
+
+<main class="container">
+
+    <section class="page-heading">
+        <span class="eyebrow">YOUR WILDLIFE ADVENTURE</span>
+        <h1>🐾 MY SIGHTINGS</h1>
+        <p>Discover wildlife and build your collection!</p>
+    </section>
+
+    <section class="stats-banner">
+        <div>
+            <span class="stats-label">TOTAL SIGHTINGS</span>
+            <strong>{{ sightings | length }}</strong>
+        </div>
+        <div class="stats-icon">🔭</div>
+    </section>
+
+    <!-- Sighting form -->
+    <section class="card sighting-form-section">
+        <h2>📸 RECORD A SIGHTING</h2>
+        <p>Found something interesting? Add it to your WildDex!</p>
+
+        <form action="/sightings" method="POST" class="sighting-form">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="animal_name">Animal Name</label>
+                    <input type="text" id="animal_name" name="animal_name"
+                           placeholder="e.g. Quokka" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="scientific_name">Scientific Name</label>
+                    <input type="text" id="scientific_name" name="scientific_name"
+                           placeholder="e.g. Setonix brachyurus" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="animal_id">iNaturalist Taxon ID</label>
+                    <input type="number" id="animal_id" name="animal_id"
+                           placeholder="e.g. 12345" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Date Spotted</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="latitude">Latitude</label>
+                    <input type="number" id="latitude" name="latitude"
+                           step="any" min="-90" max="90"
+                           placeholder="-31.9965" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="longitude">Longitude</label>
+                    <input type="number" id="longitude" name="longitude"
+                           step="any" min="-180" max="180"
+                           placeholder="115.5404" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="image">Photo URL (Optional)</label>
+                <input type="url" id="image" name="image"
+                       placeholder="https://example.com/photo.jpg">
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Field Notes</label>
+                <textarea id="notes" name="notes" rows="3"
+                          placeholder="Where did you find it? What was it doing?"></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                🐾 SAVE DISCOVERY
+            </button>
+
+        </form>
+    </section>
+
+    <!-- Saved sightings -->
+    <div class="section-heading">
+        <h2>🌟 DISCOVERED WILDLIFE</h2>
+        <span class="count">{{ sightings | length }} FOUND</span>
+    </div>
+
+    <section class="sightings-grid">
+
+        {% for sighting in sightings %}
+
+        <article class="sighting-card">
+
+            <div class="card-image">
+                {% if sighting.image and 'example.com' not in sighting.image %}
+                    <img src="{{ sighting.image }}"
+                         alt="{{ sighting.animal_name }}">
+                {% else %}
+                    <span class="animal-placeholder">🐾</span>
+                {% endif %}
+
+                <span class="discovered-badge">DISCOVERED!</span>
+            </div>
+
+            <div class="card-content">
+                <h3>{{ sighting.animal_name }}</h3>
+                <p class="scientific-name">{{ sighting.scientific_name }}</p>
+
+                <div class="sighting-details">
+                    <p>📅 {{ sighting.date }}</p>
+                    <p>📍 {{ sighting.latitude }}, {{ sighting.longitude }}</p>
+                </div>
+
+                {% if sighting.notes %}
+                    <div class="notes">{{ sighting.notes }}</div>
+                {% endif %}
+
+                <div class="card-footer">
+                    <span>🟢 RECORDED</span>
+                    <span>#{{ sighting.id }}</span>
+                </div>
+            </div>
+
+        </article>
+
+        {% else %}
+
+        <div class="empty-state">
+            <div class="empty-icon">🔎</div>
+            <h2>NO SIGHTINGS YET!</h2>
+            <p>Your wildlife collection is waiting to begin.</p>
+        </div>
+
+        {% endfor %}
+
+    </section>
+
+</main>
+
+</body>
+</html>
