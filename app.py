@@ -2,6 +2,10 @@
 from flask import Flask, render_template
 import json
 
+# load saved wildlife sightings
+with open("sightings.json", "r") as file:
+    sightings = json.load(file)
+
 app = Flask(__name__)
 
 # display player profile
@@ -13,7 +17,11 @@ def profile():
         player = json.load(file)
 
     # send player information to HTML
-    return render_template("profile.html", player=player)
+    return render_template(
+    "profile.html",
+    player=player,
+    sightings=sightings
+)
 
 
 # start Flask
