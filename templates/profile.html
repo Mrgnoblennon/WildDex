@@ -79,6 +79,18 @@
             </div>
         </section>
 
+        <div class="discoveries">
+          {% for sighting in sightings %}
+              <div class="animal">
+                  <div class="animal-icon">🐾</div>
+                  <h3>{{ sighting.animal_name }}</h3>
+                  <p>{{ sighting.scientific_name }}</p>
+                  <p>{{ sighting.date }}</p>
+                  <p>{{ sighting.notes }}</p>
+              </div>
+          {% endfor %}
+      </div>
+
     </main>
 
 </body>
