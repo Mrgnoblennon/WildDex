@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WildDex | Explore Wildlife</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header>
+    <h1>🌿 WILDDEX</h1>
+
+    <nav>
+        <a href="/" class="active">MAP</a>
+        <a href="/sightings">MY SIGHTINGS</a>
+        <a href="/profile">PROFILE</a>
+    </nav>
+</header>
+
+<main class="container map-container">
+
+    <section class="page-heading">
+        <span class="eyebrow">YOUR WILDLIFE ADVENTURE</span>
+        <h1>🌍 EXPLORE WILDLIFE</h1>
+        <p>Discover real wildlife observations around Rottnest Island!</p>
+    </section>
+
+    <section class="card map-card">
+
+        <div class="map-heading">
+            <div>
+                <h2>🗺️ WILDLIFE MAP</h2>
+                <p>Explore biodiversity through iNaturalist observations.</p>
+            </div>
+
+            <span class="rank">⭐ LVL {{ player.level }}</span>
+        </div>
+
+        <iframe
+            src="{{ url_for('wildlife_map') }}"
+            title="WildDex Wildlife Map"
+            class="wildlife-map"
+            loading="lazy">
+        </iframe>
+
+    </section>
+
+    <section class="home-actions">
+
+        <a href="/sightings" class="home-action">
+            <span>📸</span>
+            <strong>MY SIGHTINGS</strong>
+            <small>Record your discoveries</small>
+        </a>
+
+        <a href="/profile" class="home-action">
+            <span>🏆</span>
+            <strong>MY PROFILE</strong>
+            <small>View your level and XP</small>
+        </a>
+
+    </section>
+
+</main>
+
+</body>
+</html>

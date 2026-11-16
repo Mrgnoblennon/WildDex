@@ -543,3 +543,20 @@ h2 {
       width: 100%;
   }
 }
+
+/* MOBILE MAP */
+
+@media (max-width: 600px) {
+  .map-heading {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+
+  .wildlife-map {
+      height: 450px;
+  }
+
+  .home-actions {
+      grid-template-columns: 1fr;
+  }
+}

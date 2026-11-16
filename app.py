@@ -3,13 +3,34 @@ from flask import Flask, render_template, request, redirect, send_file
 from animal import Animal
 from sighting import Sighting
 from player import Player
-import json, os
+import json
+import os
 
 app = Flask(__name__)
 
 
-# player profile
+# map homepage
 @app.route("/")
+def home():
+    with open("player.json", "r") as file:
+        player = json.load(file)
+
+    return render_template("index.html", player=player)
+
+
+# display Folium map
+@app.route("/map")
+def wildlife_map():
+    map_file = os.path.join(app.root_path, "wilddex_map.html")
+
+    if not os.path.exists(map_file):
+        return "Map not found. Run inaturalistAPI.py first.", 404
+
+    return send_file(map_file)
+
+
+# player profile
+@app.route("/profile")
 def profile():
     with open("player.json", "r") as file:
         player = json.load(file)
@@ -22,6 +43,7 @@ def profile():
         player=player,
         sightings=sightings
     )
+
 
 # wildlife sightings
 @app.route("/sightings", methods=["GET", "POST"])
@@ -95,14 +117,6 @@ def view_sightings():
         sightings=sightings
     )
 
-@app.route("/map")
-def wildlife_map():
-    map_file = os.path.join(app.root_path, "wilddex_map.html")
-
-    if not os.path.exists(map_file):
-        return "Map not found. Run inaturalistAPI.py first.", 404
-
-    return send_file(map_file)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
