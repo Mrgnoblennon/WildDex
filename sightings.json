@@ -34,5 +34,17 @@
         "latitude": -31.9898,
         "longitude": 115.5355,
         "notes": "Crested tern spotted near The Basin"
+    },
+    {
+        "id": 4,
+        "animal_id": 12312412,
+        "animal_name": "Kangaroo",
+        "scientific_name": "somehting",
+        "rank": "species",
+        "image": "",
+        "date": "2026-11-26",
+        "latitude": -31.0,
+        "longitude": 115.0,
+        "notes": "Boxing ops"
     }
 ]

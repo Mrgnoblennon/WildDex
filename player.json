@@ -1,10 +1,11 @@
 {
-  "username": "Chase",
-  "level": 2,
-  "xp": 60,
-  "discovered_species": [
-    456,
-    123,
-    789
-  ]
+    "username": "Chase",
+    "level": 3,
+    "xp": 10,
+    "discovered_species": [
+        456,
+        123,
+        12312412,
+        789
+    ]
 }
