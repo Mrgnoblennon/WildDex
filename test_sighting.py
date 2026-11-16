@@ -1,6 +1,7 @@
 
 from animal import Animal
 from sighting import Sighting
+from player import Player
 import json
 
 # store all sightings
@@ -101,3 +102,13 @@ with open("sightings.json", "r") as file:
 # display loaded sightings
 for sighting in loaded_data:
     print(sighting)
+
+# create player
+player = Player("Chase")
+
+# award XP for each recorded sighting
+for sighting in sightings.values():
+    player.discover_animal(sighting.animal)
+
+# display player stats
+print(player.get_info())
