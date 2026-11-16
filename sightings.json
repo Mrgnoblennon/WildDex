@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "animal_id": 123,
+        "animal_name": "Quokka",
+        "scientific_name": "Setonix brachyurus",
+        "rank": "species",
+        "image": "https://example.com/quokka.jpg",
+        "date": "2026-11-16",
+        "latitude": -31.9965,
+        "longitude": 115.5404,
+        "notes": "Quokka spotted near Thomson Bay"
+    },
+    {
+        "id": 2,
+        "animal_id": 456,
+        "animal_name": "Rottnest Island Dugite",
+        "scientific_name": "Pseudonaja affinis",
+        "rank": "species",
+        "image": "https://example.com/dugite.jpg",
+        "date": "2026-11-16",
+        "latitude": -32.0078,
+        "longitude": 115.5182,
+        "notes": "Dugite spotted near Wadjemup Lighthouse"
+    },
+    {
+        "id": 3,
+        "animal_id": 789,
+        "animal_name": "Crested Tern",
+        "scientific_name": "Thalasseus bergii",
+        "rank": "species",
+        "image": "https://example.com/tern.jpg",
+        "date": "2026-11-16",
+        "latitude": -31.9898,
+        "longitude": 115.5355,
+        "notes": "Crested tern spotted near The Basin"
+    }
+]
