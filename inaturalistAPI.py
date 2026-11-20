@@ -1,3 +1,4 @@
+
 # library imports
 import requests, folium
 
@@ -25,7 +26,6 @@ try:
     # keep collection of each individual observation object
     observations = []
 
-
     # use request class to pull data from inaturalist, set params to params dictionary above
     response = requests.get(url, params=params, timeout=10)
     response.raise_for_status()
@@ -36,14 +36,13 @@ try:
     for result in data["results"]:
         # dont print blank or none entries as well as empty taxon data
         if result["species_guess"] is not None and result.get("taxon") is not None and result.get("geojson") is not None:
-            
             # latitude longitude data stored here
             coordinates = result["geojson"]["coordinates"]
 
             latitude = coordinates[1]
             longitude = coordinates[0]
 
-            # the following lines of code are set to grab specified data 
+            # the following lines of code are set to grab specified data
             print()
             # navigating through a returned api data object is insane, names like species guest and taxon are tough
             new_animal = Animal(result["taxon"]["id"], result.get("species_guess"), result["taxon"]["name"], result["taxon"]["rank"])
@@ -54,20 +53,20 @@ try:
             for photo in result["photos"]:
                 image_url = photo["url"].replace("square", "large")
                 image_urls.append(image_url)
-            # 
+            #
             new_observation = Observation(new_animal, result["user"]["login"], result.get("observed_on"), result.get("place_guess"), latitude, longitude, image_urls)
 
             observations.append(new_observation)
 
     # import map class
-    map = folium.Map(
+    wildlife_map = folium.Map(
         location=[-32, 115.50],
-        zoom_start=11
+        zoom_start=12,
+        tiles="OpenStreetMap"
     )
 
     # plot each animals markers on a map and images
     for observation in observations:
-        
         popup = f"<b>{observation.animal.name}</b>"
 
         if observation.image_urls:
@@ -76,12 +75,11 @@ try:
             location=[observation.latitude, observation.longitude],
             # allow html to have animal name and photo as a popup
             popup=folium.Popup(popup, max_width=250)
-        ).add_to(map)
-      
+        ).add_to(wildlife_map)
     print("----------------------------------")
 
     # save html file every execution
-    map.save("wilddex_map.html")  
+    wildlife_map.save("wilddex_map.html")
 
     # check if process worked. remove when done
     for observation in observations:
@@ -99,7 +97,6 @@ try:
         else:
             # if animal not established yet add it then set its count to 1
             species_count[name] = 1
-    
     # print animal species counts and highest animal count
     highest_count = 0
     highest_name = ""
@@ -118,24 +115,22 @@ try:
 
     search_name.lower()
 
-    # get user input, retrive key from the species count dictionary with value, 
+    # get user input, retrive key from the species count dictionary with value,
     count = species_count.get(search_name, 0)
-
 
     if search_name.strip() == "":
         print("That animal does not exist.")
-    # because the observations list isnt empty, count assigned to correct no found 
+    # because the observations list isnt empty, count assigned to correct no found
     elif count == 0:
         print(f"There aren't any recent sightings of {search_name} in the area.")
     else:
         print(f"{search_name} sightings found: {count}")
 
-            
 # any errors? except will try to resolve
 except requests.exceptions.RequestException:
     print("Connection or API error")
 else:
     print("Connection successful!")
-# finally always runs last 
+# finally always runs last
 finally:
     print("Connection over")

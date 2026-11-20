@@ -11,4 +11,4 @@ class Sighting:
     self.notes = notes
   
   def get_info(self):
-    return f"{self.sighting_id}{self.animal.name}, {self.image}, {self.date}, {self.latitude}, {self.longitude}, {self.notes}" 
+    return f"{self.sighting_id}, {self.animal.name}, {self.image}, {self.date}, {self.latitude}, {self.longitude}, {self.notes}" 
