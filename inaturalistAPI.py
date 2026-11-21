@@ -77,3 +77,25 @@ def fetch_observations():
         print("Connection over")
 
     return observations
+
+
+def search_species(observations, search_name):
+    # convert search to lowercase and remove spaces
+    search_name = search_name.strip().lower()
+
+    # count sightings for each species
+    species_count = {}
+
+    for observation in observations:
+        name = observation.animal.name.lower()
+
+        if name in species_count:
+            species_count[name] += 1
+        else:
+            species_count[name] = 1
+
+    # find number of matching sightings
+    count = species_count.get(search_name, 0)
+
+    return count
+
