@@ -18,3 +18,4 @@ class WildDexManager:
         self.sightings.append(sighting)
 
         print("Sighting added successfully!")
+
