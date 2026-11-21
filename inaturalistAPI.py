@@ -131,3 +131,34 @@ def generate_map(observations):
 
     print("WildDex map generated successfully!")
 
+
+def main():
+    # retrieve observations from iNaturalist
+    observations = fetch_observations()
+
+    # check if observations were retrieved
+    if not observations:
+        print("No observations found.")
+        return
+
+    # display retrieved observations
+    print("----------------------------------")
+
+    for observation in observations:
+        print(
+            f"ID: {observation.animal.id}, "
+            f"Name: {observation.animal.name} | "
+            f"Lat: {observation.latitude}, "
+            f"Long: {observation.longitude}"
+        )
+
+    print("----------------------------------")
+    print(f"Total observations: {len(observations)}")
+
+    # generate wildlife map
+    generate_map(observations)
+
+
+if __name__ == "__main__":
+    main()
+
