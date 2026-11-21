@@ -47,6 +47,7 @@ def main():
         print("  4. View my sightings")
         print("  5. Add a sighting")
         print("  6. Delete a sighting")
+        print("  7. Edit a sighting")
         print("  0. Exit")
 
         print("-" * 45)
@@ -188,7 +189,72 @@ def main():
 
                 except ValueError:
                     print("Please enter a valid sighting ID.")
+        
+        elif choice == "7":
+            heading("EDIT WILDLIFE SIGHTING")
 
+            if not manager.sightings:
+                print("No sightings available to edit.")
+
+            else:
+                manager.view_sightings()
+
+                try:
+                    sighting_id = int(input("\nEnter sighting ID to edit: "))
+
+                    selected = next(
+                        (
+                            s for s in manager.sightings
+                            if s.sighting_id == sighting_id
+                        ),
+                        None
+                    )
+
+                    if selected is None:
+                        print("Sighting not found.")
+
+                    else:
+                        print("\nPress Enter to keep the existing value.\n")
+
+                        updates = {}
+
+                        fields = {
+                            "animal_name": selected.animal.name,
+                            "scientific_name": selected.animal.scientific_name,
+                            "image": selected.image,
+                            "date": selected.date,
+                            "latitude": selected.latitude,
+                            "longitude": selected.longitude,
+                            "notes": selected.notes
+                        }
+
+                        for field, current in fields.items():
+                            new_value = input(
+                                f"{field.replace('_', ' ').title()} [{current}]: "
+                            ).strip()
+
+                            if new_value:
+                                if field in ("latitude", "longitude"):
+                                    new_value = float(new_value)
+
+                                    if field == "latitude" and not -90 <= new_value <= 90:
+                                        raise ValueError("Latitude must be between -90 and 90.")
+
+                                    if field == "longitude" and not -180 <= new_value <= 180:
+                                        raise ValueError("Longitude must be between -180 and 180.")
+
+                                elif field == "date":
+                                    date_type.fromisoformat(new_value)
+
+                                updates[field] = new_value
+
+                        if updates:
+                            manager.edit_sighting(sighting_id, updates)
+                        else:
+                            print("No changes made.")
+
+                except ValueError as error:
+                    print(f"Invalid input: {error}")
 
         elif choice == "0":
             print("Goodbye!")

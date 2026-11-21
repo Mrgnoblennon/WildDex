@@ -54,6 +54,54 @@ class WildDexManager:
             print(sighting.get_info())
 
     
+    def edit_sighting(self, sighting_id, updates):
+        # find the sighting using its ID
+        for sighting in self.sightings:
+            if sighting.sighting_id == sighting_id:
+
+                # save original values in case saving fails
+                original = {
+                    "animal_name": sighting.animal.name,
+                    "scientific_name": sighting.animal.scientific_name,
+                    "image": sighting.image,
+                    "date": sighting.date,
+                    "latitude": sighting.latitude,
+                    "longitude": sighting.longitude,
+                    "notes": sighting.notes
+                }
+
+                # update the selected fields
+                for field, value in updates.items():
+                    if field in ("animal_name", "scientific_name"):
+                        attribute = (
+                            "name" if field == "animal_name"
+                            else "scientific_name"
+                        )
+                        setattr(sighting.animal, attribute, value)
+
+                    elif field in original:
+                        setattr(sighting, field, value)
+
+                # save changes to JSON
+                if self.save_sightings():
+                    print("Sighting updated successfully!")
+                    return True
+
+                # restore original values if saving fails
+                sighting.animal.name = original["animal_name"]
+                sighting.animal.scientific_name = original["scientific_name"]
+
+                for field in ("image", "date", "latitude", "longitude", "notes"):
+                    setattr(sighting, field, original[field])
+
+                print("Unable to update sighting.")
+                return False
+
+        print("Sighting not found.")
+        return False
+
+
+    
     def delete_sighting(self, sighting_id):
         # find the sighting using its ID
         for sighting in self.sightings:
