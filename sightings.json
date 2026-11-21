@@ -46,5 +46,17 @@
         "latitude": -31.0,
         "longitude": 115.0,
         "notes": "Boxing ops"
+    },
+    {
+        "id": 5,
+        "animal_id": 12124,
+        "animal_name": "Godzilla",
+        "scientific_name": "Lizard God",
+        "rank": "species",
+        "image": "",
+        "date": "1998-06-13",
+        "latitude": 12.0,
+        "longitude": 32.0,
+        "notes": "Run!!"
     }
 ]

@@ -7,9 +7,11 @@ from datetime import date as date_type
 from animal import Animal
 from sighting import Sighting
 from wilddex_manager import WildDexManager
+from player_manager import PlayerManager
 
 # import API functions
 from inaturalistAPI import fetch_observations, search_species, generate_map
+
 
 
 def clear_screen():
@@ -35,6 +37,7 @@ def main():
 
     # load saved personal sightings
     manager = WildDexManager()
+    player_manager = PlayerManager()
 
     while True:
         clear_screen()
@@ -146,9 +149,18 @@ def main():
                         notes
                     )
 
-                    # add and save the sighting
+                    # add the sighting and award XP only if it was saved
+                    previous_count = len(manager.sightings)
+
                     manager.add_sighting(sighting)
 
+                    if len(manager.sightings) > previous_count:
+                        player_manager.player.discover_animal(animal)
+
+                        if player_manager.save_player():
+                            print("Player progress saved!")
+                        else:
+                            print("Warning: Player progress could not be saved.")
             except ValueError:
                 print("\nInvalid input. Check your numbers and date format.")
         
