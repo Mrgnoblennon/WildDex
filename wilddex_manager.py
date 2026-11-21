@@ -53,6 +53,29 @@ class WildDexManager:
         for sighting in self.sightings:
             print(sighting.get_info())
 
+    
+    def delete_sighting(self, sighting_id):
+        # find the sighting using its ID
+        for sighting in self.sightings:
+            if sighting.sighting_id == sighting_id:
+
+                # remove sighting from the collection
+                self.sightings.remove(sighting)
+
+                # save the updated collection
+                if self.save_sightings():
+                    print("Sighting deleted successfully!")
+                    return True
+
+                # restore the sighting if saving fails
+                self.sightings.append(sighting)
+                print("Unable to delete sighting.")
+                return False
+
+        print("Sighting not found.")
+        return False
+
+
     def save_sightings(self):
         # convert Sighting objects into dictionaries
         data = []
@@ -129,3 +152,4 @@ class WildDexManager:
         except (OSError, json.JSONDecodeError, KeyError,
                 TypeError, ValueError) as error:
             print(f"Error loading sightings: {error}")
+

@@ -46,17 +46,5 @@
         "latitude": -31.0,
         "longitude": 115.0,
         "notes": "Boxing ops"
-    },
-    {
-        "id": 5,
-        "animal_id": 1234124412421,
-        "animal_name": "Big Foot",
-        "scientific_name": "Gigantopithecus blacki",
-        "rank": "species",
-        "image": "bigfoot.jpg",
-        "date": "2026-11-19",
-        "latitude": -32.0,
-        "longitude": 115.5,
-        "notes": "I really saw it, please you have to believe me!!"
     }
 ]

@@ -46,6 +46,7 @@ def main():
         print("  3. Generate wildlife map")
         print("  4. View my sightings")
         print("  5. Add a sighting")
+        print("  6. Delete a sighting")
         print("  0. Exit")
 
         print("-" * 45)
@@ -149,6 +150,45 @@ def main():
 
             except ValueError:
                 print("\nInvalid input. Check your numbers and date format.")
+        
+        elif choice == "6":
+            heading("DELETE WILDLIFE SIGHTING")
+
+            if not manager.sightings:
+                print("No sightings available to delete.")
+
+            else:
+                manager.view_sightings()
+
+                try:
+                    sighting_id = int(input("\nEnter sighting ID to delete: "))
+
+                    # find the selected sighting
+                    selected = None
+
+                    for sighting in manager.sightings:
+                        if sighting.sighting_id == sighting_id:
+                            selected = sighting
+                            break
+
+                    if selected is None:
+                        print("Sighting not found.")
+
+                    else:
+                        print(f"\nSelected: {selected.animal.name}")
+
+                        confirmation = input(
+                            "Are you sure you want to delete this sighting? (y/n): "
+                        ).strip().lower()
+
+                        if confirmation == "y":
+                            manager.delete_sighting(sighting_id)
+                        else:
+                            print("Deletion cancelled.")
+
+                except ValueError:
+                    print("Please enter a valid sighting ID.")
+
 
         elif choice == "0":
             print("Goodbye!")
