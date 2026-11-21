@@ -99,3 +99,35 @@ def search_species(observations, search_name):
 
     return count
 
+
+def generate_map(observations):
+    # create map centred on Rottnest Island
+    wildlife_map = folium.Map(
+        location=[-32, 115.50],
+        zoom_start=11
+    )
+
+    # add a marker for each observation
+    for observation in observations:
+        popup = f"<b>{observation.animal.name}</b>"
+
+        # add animal image if available
+        if observation.image_urls:
+            popup += (
+                f'<p><img src="{observation.image_urls[0]}" '
+                f'width="200"></p>'
+            )
+
+        folium.Marker(
+            location=[
+                observation.latitude,
+                observation.longitude
+            ],
+            popup=folium.Popup(popup, max_width=250)
+        ).add_to(wildlife_map)
+
+    # save map as HTML
+    wildlife_map.save("wilddex_map.html")
+
+    print("WildDex map generated successfully!")
+
