@@ -32,6 +32,59 @@ def heading(title):
     print("=" * 45)
 
 
+def browse_observations(observations):
+    if not observations:
+        print("Please retrieve observations first.")
+        return
+
+    page = 0
+    page_size = 5
+
+    while True:
+        clear_screen()
+        heading("WILDLIFE OBSERVATIONS")
+
+        start = page * page_size
+        end = start + page_size
+        current_page = observations[start:end]
+
+        print(f"\nTotal observations: {len(observations)}")
+        print(f"Showing {start + 1}-{min(end, len(observations))}\n")
+
+        for number, observation in enumerate(current_page, start=start + 1):
+            print(f"{number}. {observation.animal.name}")
+            print(f"   Scientific name: {observation.animal.scientific_name}")
+            print(f"   Observer: {observation.observer}")
+            print(f"   Date: {observation.date}")
+            print(f"   Location: {observation.location}")
+            print("-" * 45)
+
+        print("\n[N] Next page")
+        print("[P] Previous page")
+        print("[0] Return to menu")
+
+        choice = input("\nSelect an option: ").strip().lower()
+
+        if choice == "0":
+            break
+        elif choice == "n":
+            if end < len(observations):
+                page += 1
+            else:
+                print("Already on the last page.")
+                pause()
+        elif choice == "p":
+            if page > 0:
+                page -= 1
+            else:
+                print("Already on the first page.")
+                pause()
+        else:
+            print("Invalid option.")
+            pause()
+
+
+
 def main():
     # store observations retrieved from iNaturalist
     observations = []
@@ -53,6 +106,7 @@ def main():
         print("  6. Delete a sighting")
         print("  7. Edit a sighting")
         print("  8. View Player Profile")
+        print("  9. Browse wildlife observations")
         print("  0. Exit")
 
         print("-" * 45)
@@ -338,6 +392,9 @@ def main():
             print(f"Total Sightings: {len(manager.sightings)}")
 
             print("-" * 45)
+
+        elif choice == "9":
+            browse_observations(observations)
 
         elif choice == "0":
             print("Goodbye!")
