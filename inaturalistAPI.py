@@ -53,6 +53,27 @@ def fetch_observations(latitude=-31.9965, longitude=115.5404, radius=7):
                     result["taxon"]["rank"]
                 )
 
+                groups = {
+                    "Aves": "Birds",
+                    "Mammalia": "Mammals",
+                    "Reptilia": "Reptiles",
+                    "Amphibia": "Amphibians",
+                    "Insecta": "Insects",
+                    "Arachnida": "Arachnids",
+                    "Actinopterygii": "Fish",
+                    "Mollusca": "Molluscs",
+                    "Plantae": "Plants",
+                    "Fungi": "Fungi"
+                }
+
+                iconic_group = result["taxon"].get(
+                    "iconic_taxon_name"
+                )
+
+                new_animal.group = groups.get(
+                    iconic_group, "Other"
+                )               
+
                 image_urls = []
 
                 for photo in result.get("photos", []):

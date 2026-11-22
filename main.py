@@ -1,5 +1,3 @@
-"""WildDex command-line interface with keyboard-driven menus."""
-
 import os
 from datetime import date as date_type
 
@@ -11,6 +9,7 @@ from wilddex_manager import WildDexManager
 from player_manager import PlayerManager
 from locations import LOCATIONS
 from inaturalistAPI import fetch_observations, search_species, generate_map
+from conservation import get_conservation_status
 
 
 def clear_screen():
@@ -123,7 +122,7 @@ def browse_observations(observations):
 
 
 def wildlife_field_guide(observations):
-    """Browse unique species in the currently retrieved iNaturalist results."""
+    """Browse unique taxa with searchable, sortable, filterable results."""
     if not observations:
         clear_screen()
         heading("WILDLIFE FIELD GUIDE")
@@ -133,47 +132,91 @@ def wildlife_field_guide(observations):
 
     species = {}
     for observation in observations:
-        animal = observation.animal
-        # Taxon IDs distinguish species with similar common names.
-        if animal.id not in species:
-            species[animal.id] = []
-        species[animal.id].append(observation)
+        species.setdefault(observation.animal.id, []).append(observation)
 
-    ordered_ids = sorted(
-        species,
-        key=lambda animal_id: (
-            species[animal_id][0].animal.name or ""
-        ).casefold()
-    )
+    search_term = ""
+    group_filter = "All groups"
+    sort_mode = "A-Z"
     page = 0
     page_size = 8
 
     while True:
         clear_screen()
         heading("WILDLIFE FIELD GUIDE")
-        total_pages = (len(ordered_ids) + page_size - 1) // page_size
-        print(f"\n{len(ordered_ids)} unique taxa in {len(observations)} observations")
-        print(f"Page {page + 1}/{total_pages}\n")
+        available_groups = sorted({
+            getattr(records[0].animal, "group", "Unknown") or "Unknown"
+            for records in species.values()
+        })
+        if group_filter not in available_groups:
+            group_filter = "All groups"
+
+        visible_ids = []
+        for animal_id, records in species.items():
+            animal = records[0].animal
+            name = (animal.name or "").casefold()
+            scientific = (animal.scientific_name or "").casefold()
+            group = getattr(animal, "group", "Unknown") or "Unknown"
+            if search_term and search_term.casefold() not in name and search_term.casefold() not in scientific:
+                continue
+            if group_filter != "All groups" and group != group_filter:
+                continue
+            visible_ids.append(animal_id)
+
+        if sort_mode == "Most observed":
+            visible_ids.sort(key=lambda ident: (-len(species[ident]), (species[ident][0].animal.name or "").casefold()))
+        elif sort_mode == "Least observed":
+            visible_ids.sort(key=lambda ident: (len(species[ident]), (species[ident][0].animal.name or "").casefold()))
+        else:
+            visible_ids.sort(key=lambda ident: (species[ident][0].animal.name or "").casefold(), reverse=sort_mode == "Z-A")
+
+        total_pages = max(1, (len(visible_ids) + page_size - 1) // page_size)
+        page = min(page, total_pages - 1)
         start = page * page_size
+        print(f"\nShowing {len(visible_ids)} of {len(species)} taxa | Page {page + 1}/{total_pages}")
+        print(f"Search: {search_term or 'None'} | Group: {group_filter} | Sort: {sort_mode}\n")
+
         options = []
-        for animal_id in ordered_ids[start:start + page_size]:
+        for animal_id in visible_ids[start:start + page_size]:
             records = species[animal_id]
             animal = records[0].animal
-            label = f"{animal.name} ({len(records)} observations)"
-            options.append((label, animal_id))
+            options.append((f"{animal.name} ({len(records)} observations)", animal_id))
+        if not visible_ids:
+            print("No matching species. Change or reset your filters.\n")
         if page > 0:
-            options.append(("Previous page", "__previous__"))
-        if start + page_size < len(ordered_ids):
-            options.append(("Next page", "__next__"))
-        options.append(("Back to Explore", None))
-
-        selected = select_menu("Choose a species", options)
+            options.append(("← Previous page", "__previous__"))
+        if start + page_size < len(visible_ids):
+            options.append(("Next page →", "__next__"))
+        options.extend([
+            ("Search species", "__search__"),
+            ("Filter animal group", "__group__"),
+            ("Sort species", "__sort__"),
+            ("Reset filters", "__reset__"),
+            ("Back to Explore", None),
+        ])
+        selected = select_menu("Choose a species or refine results", options)
         if selected is None:
             return
         if selected == "__previous__":
             page -= 1
         elif selected == "__next__":
             page += 1
+        elif selected == "__search__":
+            entered = questionary.text("Common or scientific name (blank clears search):", default=search_term).ask()
+            if entered is not None:
+                search_term = entered.strip()
+                page = 0
+        elif selected == "__group__":
+            group = select_menu("Choose animal group", [("All groups", "All groups")] + [(name, name) for name in available_groups] + [("Back", None)])
+            if group is not None:
+                group_filter = group
+                page = 0
+        elif selected == "__sort__":
+            mode = select_menu("Sort field guide", [(name, name) for name in ("A-Z", "Z-A", "Most observed", "Least observed")] + [("Back", None)])
+            if mode is not None:
+                sort_mode = mode
+                page = 0
+        elif selected == "__reset__":
+            search_term, group_filter, sort_mode, page = "", "All groups", "A-Z", 0
         else:
             view_field_guide_species(species[selected])
 
@@ -207,7 +250,35 @@ def view_field_guide_species(observations):
                 print(f"  {url}")
         else:
             print("\nNo photographs available.")
-        print("\nConservation status: Not yet integrated")
+        
+        print("\n" + "-" * 48)
+        print("CONSERVATION INFORMATION")
+
+        listings = get_conservation_status(animal.id)
+
+        if not listings:
+            print("Conservation listing: Not available")
+            print("This does not mean the species is safe.")
+
+        else:
+            for listing in listings:
+                code = listing["code"]
+                name = listing["name"]
+
+                if listing["threatened"]:
+                    print("\n!!! THREATENED SPECIES !!!")
+                elif code == "NT":
+                    print("\n! NEAR THREATENED !")
+                elif code in ("EW", "EX"):
+                    print("\n!!! EXTINCTION STATUS !!!")
+
+                print(f"\nStatus: {name} ({code})")
+                print(f"Authority: {listing['authority']}")
+                print(f"Scope: {listing['region']}")
+
+        print("\nPopulation trend: Not available")
+        print("Habitat and ecological role: Not yet integrated")
+
         print("Observation counts are not global population estimates.")
         selected = select_menu("Species options", [
             ("Browse observations for this species", "observations"),

@@ -1,8 +1,5 @@
 
-# Australian wildlife exploration locations
-# Coordinates are approximate search centres
-# Radius is measured in kilometres
-
+# australian wildlife exploration locations
 LOCATIONS = {
     "Western Australia": {
         "Rottnest Island": (-31.9965, 115.5404, 7),
