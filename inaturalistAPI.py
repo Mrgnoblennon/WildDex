@@ -2,6 +2,7 @@
 # library imports
 import requests
 import folium
+from pathlib import Path
 
 # import my local classes
 from animal import Animal
@@ -127,8 +128,11 @@ def generate_map(observations):
         ).add_to(wildlife_map)
 
     # save map as HTML
-    wildlife_map.save("generated/wilddex_map.html")
+    output_folder = Path(__file__).resolve().parent / "generated"
+    output_folder.mkdir(exist_ok=True)
 
+    output_file = output_folder / "wilddex_map.html"
+    wildlife_map.save(str(output_file))
     print("WildDex map generated successfully!")
 
 
