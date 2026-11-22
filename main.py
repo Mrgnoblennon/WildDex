@@ -126,17 +126,14 @@ def browse_observations(observations):
             pause()
 
 
-def view_discoveries(player, sightings):
-    clear_screen()
-    heading("MY DISCOVERED SPECIES")
 
+def view_discoveries(player, sightings):
     # store species information using animal IDs
     collection = {}
 
     for sighting in sightings:
         animal = sighting.animal
 
-        # only include species the player has discovered
         if animal.id in player.discovered_species:
 
             if animal.id not in collection:
@@ -148,20 +145,156 @@ def view_discoveries(player, sightings):
 
             collection[animal.id]["count"] += 1
 
-    print(f"\nSpecies discovered: {len(player.discovered_species)}")
-    print(f"Species with saved sightings: {len(collection)}")
-    print("-" * 45)
+    while True:
+        clear_screen()
+        heading("MY DISCOVERED SPECIES")
 
-    if not collection:
-        print("No discovered species with saved sightings.")
+        print(f"\nSpecies discovered: {len(player.discovered_species)}")
+        print(f"Species with saved sightings: {len(collection)}")
+        print("-" * 45)
+
+        if not collection:
+            print("No discovered species with saved sightings.")
+            pause()
+            return
+
+        # keep the animal IDs in the same order as the menu
+        animal_ids = list(collection.keys())
+
+        for number, animal_id in enumerate(animal_ids, start=1):
+            species = collection[animal_id]
+
+            print(f"\n{number}. {species['name']}")
+            print(f"   Scientific name: {species['scientific_name']}")
+            print(f"   Times recorded: {species['count']}")
+
+        print("\n[0] Return to main menu")
+
+        choice = input("\nSelect a species: ").strip()
+
+        if choice == "0":
+            break
+
+        if choice.isdigit():
+            selected_number = int(choice)
+
+            if 1 <= selected_number <= len(animal_ids):
+                animal_id = animal_ids[selected_number - 1]
+                view_species_profile(animal_id, sightings)
+            else:
+                print("Invalid species number.")
+                pause()
+        else:
+            print("Please enter a valid number.")
+            pause()
+
+
+def view_species_profile(animal_id, sightings):
+    clear_screen()
+    heading("SPECIES PROFILE")
+
+    # find all saved sightings for this animal
+    species_sightings = []
+
+    for sighting in sightings:
+        if sighting.animal.id == animal_id:
+            species_sightings.append(sighting)
+
+    if not species_sightings:
+        print("No saved sightings found for this species.")
+        pause()
         return
 
-    for number, species in enumerate(collection.values(), start=1):
-        print(f"\n{number}. {species['name']}")
-        print(f"   Scientific name: {species['scientific_name']}")
-        print(f"   Times recorded: {species['count']}")
+    # use the first sighting to get animal information
+    animal = species_sightings[0].animal
+
+    print(f"\nAnimal: {animal.name}")
+    print(f"Scientific name: {animal.scientific_name}")
+    print(f"Taxonomic rank: {animal.rank}")
+    print(f"Animal ID: {animal.id}")
+    print(f"Times recorded: {len(species_sightings)}")
 
     print("\n" + "-" * 45)
+    print("SIGHTING HISTORY")
+
+    # display each sighting for this animal
+    for number, sighting in enumerate(species_sightings, start=1):
+        print(f"\nSighting {number}")
+        print(f"Date: {sighting.date}")
+        print(f"Latitude: {sighting.latitude}")
+        print(f"Longitude: {sighting.longitude}")
+        print(f"Notes: {sighting.notes or 'None'}")
+        print("-" * 45)
+
+    pause()
+
+
+def view_wildlife_statistics(player, sightings):
+    clear_screen()
+    heading("WILDLIFE STATISTICS")
+
+    total_sightings = len(sightings)
+
+    # dictionaries to count species and dates
+    species_counts = {}
+    date_counts = {}
+
+    for sighting in sightings:
+        animal_id = sighting.animal.id
+        animal_name = sighting.animal.name
+        sighting_date = sighting.date
+
+        # group sightings by animal ID
+        if animal_id not in species_counts:
+            species_counts[animal_id] = {
+                "name": animal_name,
+                "count": 0
+            }
+
+        species_counts[animal_id]["count"] += 1
+
+        # count sightings recorded on each date
+        if sighting_date not in date_counts:
+            date_counts[sighting_date] = 0
+
+        date_counts[sighting_date] += 1
+
+    print(f"\nPlayer: {player.username}")
+    print(f"Level: {player.level}")
+    print(f"XP: {player.xp}/100")
+
+    print("-" * 45)
+
+    print(f"Total saved sightings: {total_sightings}")
+    print(f"Unique species recorded: {len(species_counts)}")
+    print(f"Lifetime species discovered: {len(player.discovered_species)}")
+
+    if not sightings:
+        print("\nNo sightings available for statistics.")
+        return
+
+    # sort species from most to least recorded
+    ranked_species = sorted(
+        species_counts.values(),
+        key=lambda species: species["count"],
+        reverse=True
+    )
+
+    print("\n" + "-" * 45)
+    print("TOP 5 MOST RECORDED SPECIES")
+
+    for number, species in enumerate(ranked_species[:5], start=1):
+        print(f"{number}. {species['name']} - {species['count']} sightings")
+
+    # find the date with the most saved sightings
+    busiest_date = max(date_counts, key=date_counts.get)
+
+    print("\n" + "-" * 45)
+    print("EXPLORATION ACTIVITY")
+
+    print(f"Most recorded animal: {ranked_species[0]['name']}")
+    print(f"Busiest sighting date: {busiest_date}")
+    print(f"Sightings on that date: {date_counts[busiest_date]}")
 
 
 def main():
@@ -187,6 +320,7 @@ def main():
         print("  8. View Player Profile")
         print("  9. Browse wildlife observations")
         print("  10. View Discovered Species")
+        print("  11. Wildlife Statistics")
         print("  0. Exit")
 
         print("-" * 45)
@@ -478,6 +612,12 @@ def main():
 
         elif choice == "10":
             view_discoveries(
+                player_manager.player,
+                manager.sightings
+            )
+
+        elif choice == "11":
+            view_wildlife_statistics(
                 player_manager.player,
                 manager.sightings
             )
