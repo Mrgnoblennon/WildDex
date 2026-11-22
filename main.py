@@ -32,6 +32,36 @@ def heading(title):
     print("=" * 45)
 
 
+def view_observation_details(observation):
+    clear_screen()
+    heading("OBSERVATION DETAILS")
+
+    print(f"\nAnimal: {observation.animal.name}")
+    print(f"Scientific name: {observation.animal.scientific_name}")
+    print(f"Taxonomic rank: {observation.animal.rank}")
+    print(f"Animal ID: {observation.animal.id}")
+
+    print("-" * 45)
+
+    print(f"Observer: {observation.observer}")
+    print(f"Date: {observation.date or 'Unknown'}")
+    print(f"Location: {observation.location or 'Unknown'}")
+    print(f"Latitude: {observation.latitude}")
+    print(f"Longitude: {observation.longitude}")
+
+    print("-" * 45)
+
+    if observation.image_urls:
+        print("\nPhotographs:")
+
+        for number, image_url in enumerate(observation.image_urls[:3], start=1):
+            print(f"{number}. {image_url}")
+    else:
+        print("\nNo photographs available.")
+
+    pause()
+
+
 def browse_observations(observations):
     if not observations:
         print("Please retrieve observations first.")
@@ -59,7 +89,8 @@ def browse_observations(observations):
             print(f"   Location: {observation.location}")
             print("-" * 45)
 
-        print("\n[N] Next page")
+        print("\nEnter an observation number to view details.")
+        print("[N] Next page")
         print("[P] Previous page")
         print("[0] Return to menu")
 
@@ -79,6 +110,17 @@ def browse_observations(observations):
             else:
                 print("Already on the first page.")
                 pause()
+
+        elif choice.isdigit():
+            selected_number = int(choice)
+
+            if start + 1 <= selected_number <= min(end, len(observations)):
+                selected_observation = observations[selected_number - 1]
+                view_observation_details(selected_observation)
+            else:
+                print("Please select a number shown on this page.")
+                pause()
+
         else:
             print("Invalid option.")
             pause()
