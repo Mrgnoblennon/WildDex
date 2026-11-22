@@ -8,6 +8,7 @@ from animal import Animal
 from sighting import Sighting
 from wilddex_manager import WildDexManager
 from player_manager import PlayerManager
+from locations import choose_location
 
 # import API functions
 from inaturalistAPI import fetch_observations, search_species, generate_map
@@ -63,9 +64,24 @@ def main():
         if choice == "1":
             heading("RETRIEVE OBSERVATIONS")
 
-            observations = fetch_observations()
+            selected_location = choose_location()
 
-            print(f"\nRetrieved {len(observations)} observations.")
+            if selected_location is not None:
+                name, latitude, longitude, radius = selected_location
+
+                print(f"\nSearching for wildlife near {name}...")
+
+                new_observations = fetch_observations(
+                    latitude, longitude, radius
+                )
+
+                if new_observations:
+                    observations = new_observations
+                    print(f"\nLocation: {name}")
+                    print(f"Retrieved {len(observations)} observations.")
+                else:
+                    observations = []
+                    print("\nNo observations retrieved for this location.")
 
         elif choice == "2":
             heading("SEARCH FOR AN ANIMAL")

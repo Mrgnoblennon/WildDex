@@ -15,21 +15,24 @@ url = "https://api.inaturalist.org/v1/observations"
 params = {
     "taxon_id": 1,
     "per_page": 200,
-    # rotto co-ordinates
-    "lat": -32,
-    "lng": 115.50,
-    "radius": 7,
+    "lat": -31.9965,
+    "lng": 115.5404,
+    "radius": 7
 }
 
 
-def fetch_observations():
+
+def fetch_observations(latitude=-31.9965, longitude=115.5404, radius=7):
     # keep collection of each individual observation object
     observations = []
-
+    search_params = params.copy()
+    search_params["lat"] = latitude
+    search_params["lng"] = longitude
+    search_params["radius"] = radius
     try:
         print("Connection started...")
 
-        response = requests.get(url, params=params, timeout=10)
+        response = requests.get(url, params=search_params, timeout=10)
         response.raise_for_status()
         data = response.json()
 
@@ -101,11 +104,14 @@ def search_species(observations, search_name):
     return count
 
 
+
 def generate_map(observations):
-    # create map centred on Rottnest Island
+    # centre map around the retrieved observations
+    first = observations[0]
+
     wildlife_map = folium.Map(
-        location=[-32, 115.50],
-        zoom_start=11
+        location=[first.latitude, first.longitude],
+        zoom_start=10
     )
 
     # add a marker for each observation
