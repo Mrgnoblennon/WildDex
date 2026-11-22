@@ -1,9 +1,11 @@
 """WildDex command-line interface with keyboard-driven menus."""
 
 import os
+import sys
 from datetime import date as date_type
 
 import questionary
+from questionary import Style, Separator
 
 from animal import Animal
 from sighting import Sighting
@@ -15,6 +17,32 @@ from conservation import get_conservation_status
 from species_info import display_species_info
 
 
+# Nature-inspired palette. Respect NO_COLOR and non-interactive terminals.
+USE_COLOR = sys.stdout.isatty() and "NO_COLOR" not in os.environ
+
+SAGE = "\033[38;2;164;214;176m"
+AMBER = "\033[38;2;227;199;140m"
+BLUE = "\033[38;2;141;169;184m"
+CORAL = "\033[38;2;225;139;128m"
+RESET = "\033[0m"
+
+MENU_STYLE = Style([
+    ("qmark", "fg:#A4D6B0 bold"),
+    ("question", "fg:#E3C78C bold"),
+    ("pointer", "fg:#A4D6B0 bold"),
+    ("highlighted", "fg:#A4D6B0 bold"),
+    ("selected", "fg:#A4D6B0"),
+    ("answer", "fg:#A4D6B0 bold"),
+    ("separator", "fg:#718C7B"),
+    ("instruction", "fg:#8DA9B8"),
+    ("text", "fg:#E7E9DF"),
+]) if USE_COLOR else None
+
+
+def colored(text, color):
+    return f"{color}{text}{RESET}" if USE_COLOR else str(text)
+
+
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
 
@@ -24,20 +52,21 @@ def pause():
 
 
 def heading(title):
-    print("\n" + "=" * 54)
-    print(f"  {title}")
-    print("=" * 54)
+    print("\n" + colored("=" * 54, SAGE))
+    print(colored(f"  {title}", SAGE))
+    print(colored("=" * 54, SAGE))
     print()
 
 
 def section(title):
-    print(f"\n  {title.upper()}")
-    print("  " + "-" * 50)
+    print()
+    print(colored(f"  {title.upper()}", AMBER))
+    print(colored("  " + "-" * 50, BLUE))
     print()
 
 
 def detail(label, value):
-    print(f"  {label}: {value}")
+    print(f"  {colored(label + ':', BLUE)} {value}")
 
 
 def note(message):
@@ -45,9 +74,22 @@ def note(message):
 
 
 def select_menu(title, options):
-    """Select a (label, value) pair using arrow keys; Esc cancels."""
-    choices = [questionary.Choice(title=label, value=value) for label, value in options]
-    return questionary.select(title, choices=choices, use_shortcuts=False).ask()
+    """Spaced arrow-key menu with a reliable explicit Back option."""
+    back_value = "__wilddex_back__"
+    choices = []
+    for index, (label, value) in enumerate(options):
+        if index:
+            choices.append(Separator(" "))
+        choices.append(questionary.Choice(
+            title=label,
+            value=back_value if value is None else value,
+        ))
+    print()
+    result = questionary.select(
+        title, choices=choices, use_shortcuts=False,
+        style=MENU_STYLE,
+    ).ask()
+    return None if result in (None, back_value) else result
 
 
 def choose_location():
@@ -56,7 +98,7 @@ def choose_location():
         clear_screen()
         heading("CHOOSE A STATE OR TERRITORY")
         state = select_menu(
-            "Choose a state (Esc to go back)",
+            "Choose a state (select Back to return)",
             [(name, name) for name in LOCATIONS] + [("Back", None)],
         )
         if state is None:
@@ -64,7 +106,7 @@ def choose_location():
         clear_screen()
         heading(state.upper())
         location = select_menu(
-            "Choose a location (Esc to go back)",
+            "Choose a location (select Back to return)",
             [(name, name) for name in LOCATIONS[state]] + [("Back to states", None)],
         )
         if location is None:
