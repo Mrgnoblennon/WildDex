@@ -51,6 +51,7 @@ def main():
         print("  5. Add a sighting")
         print("  6. Delete a sighting")
         print("  7. Edit a sighting")
+        print("  8. View Player Profile")
         print("  0. Exit")
 
         print("-" * 45)
@@ -267,6 +268,25 @@ def main():
 
                 except ValueError as error:
                     print(f"Invalid input: {error}")
+
+        elif choice == "8":
+            heading("WILDDEX PLAYER PROFILE")
+
+            # get the current player
+            player = player_manager.player
+
+            # display player information
+            print(f"\nUsername: {player.username}")
+            print(f"Level: {player.level}")
+            print(f"XP: {player.xp}/100")
+
+            print("-" * 45)
+
+            # display wildlife statistics
+            print(f"Species Discovered: {len(player.discovered_species)}")
+            print(f"Total Sightings: {len(manager.sightings)}")
+
+            print("-" * 45)
 
         elif choice == "0":
             print("Goodbye!")
