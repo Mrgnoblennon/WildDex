@@ -80,9 +80,30 @@ def main():
                     print("Please enter an animal name.")
 
                 else:
+
                     count = search_species(observations, animal_name)
 
                     print(f"\nMatching sightings: {count}")
+
+                    if count > 0:
+                        shown = 0
+
+                        for observation in observations:
+                            if observation.animal.name.lower() == animal_name.lower():
+                                print("-" * 45)
+                                print(f"Animal: {observation.animal.name}")
+                                print(f"Scientific name: {observation.animal.scientific_name}")
+                                print(f"Observer: {observation.observer}")
+                                print(f"Date: {observation.date}")
+                                print(f"Location: {observation.location}")
+
+                                shown += 1
+
+                                if shown == 10:
+                                    break
+
+                        if count > 10:
+                            print(f"\nShowing 10 of {count} matching observations.")
 
         elif choice == "3":
             heading("GENERATE WILDLIFE MAP")
