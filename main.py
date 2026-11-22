@@ -1,3 +1,5 @@
+"""WildDex command-line interface with keyboard-driven menus."""
+
 import os
 from datetime import date as date_type
 
@@ -22,25 +24,30 @@ def pause():
 
 
 def heading(title):
-    print("\n" + "=" * 48)
+    print("\n" + "=" * 54)
     print(f"  {title}")
-    print("=" * 48)
+    print("=" * 54)
+    print()
+
+
+def section(title):
+    print(f"\n  {title.upper()}")
+    print("  " + "-" * 50)
+    print()
+
+
+def detail(label, value):
+    print(f"  {label}: {value}")
+
+
+def note(message):
+    print(f"  {message}")
 
 
 def select_menu(title, options):
-    """Select an option with arrow keys; Back returns None."""
-    back_value = "__wilddex_back__"
-    choices = [
-        questionary.Choice(
-            title=label,
-            value=back_value if value is None else value
-        )
-        for label, value in options
-    ]
-    result = questionary.select(
-        title, choices=choices, use_shortcuts=False
-    ).ask()
-    return None if result in (None, back_value) else result
+    """Select a (label, value) pair using arrow keys; Esc cancels."""
+    choices = [questionary.Choice(title=label, value=value) for label, value in options]
+    return questionary.select(title, choices=choices, use_shortcuts=False).ask()
 
 
 def choose_location():
@@ -49,7 +56,7 @@ def choose_location():
         clear_screen()
         heading("CHOOSE A STATE OR TERRITORY")
         state = select_menu(
-            "Choose a state (select Back to return)",
+            "Choose a state (Esc to go back)",
             [(name, name) for name in LOCATIONS] + [("Back", None)],
         )
         if state is None:
@@ -57,7 +64,7 @@ def choose_location():
         clear_screen()
         heading(state.upper())
         location = select_menu(
-            "Choose a location (select Back to return)",
+            "Choose a location (Esc to go back)",
             [(name, name) for name in LOCATIONS[state]] + [("Back to states", None)],
         )
         if location is None:
@@ -69,19 +76,20 @@ def choose_location():
 def view_observation_details(observation):
     clear_screen()
     heading("OBSERVATION DETAILS")
-    print(f"\nAnimal: {observation.animal.name}")
+    section("Animal")
+    detail("Animal", observation.animal.name)
     print(f"Scientific name: {observation.animal.scientific_name}")
     print(f"Taxonomic rank: {observation.animal.rank}")
     print(f"Animal ID: {observation.animal.id}")
-    print("-" * 48)
+    section("Observation details")
     print(f"Observer: {observation.observer}")
     print(f"Date: {observation.date or 'Unknown'}")
     print(f"Location: {observation.location or 'Unknown'}")
     print(f"Latitude: {observation.latitude}")
     print(f"Longitude: {observation.longitude}")
-    print("-" * 48)
+    section("Photographs")
     if observation.image_urls:
-        print("\nPhotographs:")
+        
         for number, image_url in enumerate(observation.image_urls[:3], start=1):
             print(f"{number}. {image_url}")
     else:
@@ -127,7 +135,7 @@ def wildlife_field_guide(observations):
     if not observations:
         clear_screen()
         heading("WILDLIFE FIELD GUIDE")
-        print("\nChoose a location and retrieve observations first.")
+        note("Choose a location and retrieve observations first.")
         pause()
         return
 
@@ -173,8 +181,13 @@ def wildlife_field_guide(observations):
         total_pages = max(1, (len(visible_ids) + page_size - 1) // page_size)
         page = min(page, total_pages - 1)
         start = page * page_size
-        print(f"\nShowing {len(visible_ids)} of {len(species)} taxa | Page {page + 1}/{total_pages}")
-        print(f"Search: {search_term or 'None'} | Group: {group_filter} | Sort: {sort_mode}\n")
+        section("Results")
+        detail("Showing", f"{len(visible_ids)} of {len(species)} taxa")
+        detail("Page", f"{page + 1}/{total_pages}")
+        detail("Search", search_term or "None")
+        detail("Group", group_filter)
+        detail("Sort", sort_mode)
+        print()
 
         options = []
         for animal_id in visible_ids[start:start + page_size]:
@@ -182,7 +195,7 @@ def wildlife_field_guide(observations):
             animal = records[0].animal
             options.append((f"{animal.name} ({len(records)} observations)", animal_id))
         if not visible_ids:
-            print("No matching species. Change or reset your filters.\n")
+            note("No matching species. Change or reset your filters.")
         if page > 0:
             options.append(("← Previous page", "__previous__"))
         if start + page_size < len(visible_ids):
@@ -190,7 +203,7 @@ def wildlife_field_guide(observations):
         options.extend([
             ("Search species", "__search__"),
             ("Filter animal group", "__group__"),
-            ("Sort species", "__sort__"),  
+            ("Sort species", "__sort__"),
             ("Reset filters", "__reset__"),
             ("Back to Explore", None),
         ])
@@ -223,64 +236,68 @@ def wildlife_field_guide(observations):
 
 
 def view_field_guide_species(observations):
-    """Display species information already available from iNaturalist."""
+    """Display species details, conservation listings and further reading."""
     animal = observations[0].animal
     while True:
         clear_screen()
         heading("FIELD GUIDE - SPECIES PROFILE")
-        print(f"\nCommon name: {animal.name}")
-        print(f"Scientific name: {animal.scientific_name}")
-        print(f"Taxonomic rank: {animal.rank}")
-        print(f"iNaturalist taxon ID: {animal.id}")
-        print(f"Observations in current results: {len(observations)}")
+        section("Species identity")
+        detail("Common name", animal.name)
+        detail("Scientific name", animal.scientific_name)
+        detail("Taxonomic rank", animal.rank)
+        detail("iNaturalist taxon ID", animal.id)
+
+        section("Observation data")
+        detail("Observations in current results", len(observations))
         locations = sorted({
             str(o.location).strip()
             for o in observations if o.location
         })
-        print(f"Recorded locations in results: {len(locations)}")
+        detail("Recorded locations in results", len(locations))
         for location in locations[:5]:
-            print(f"  - {location}")
+            note(f"- {location}")
         if len(locations) > 5:
-            print(f"  ... and {len(locations) - 5} more")
+            note(f"... and {len(locations) - 5} more")
+
+        section("Photographs")
         photos = list(dict.fromkeys(
             url for o in observations for url in (o.image_urls or [])
         ))
         if photos:
-            print("\nPhotograph URLs:")
             for url in photos[:3]:
-                print(f"  {url}")
+                note(url)
         else:
-            print("\nNo photographs available.")
-        
-        print("\n" + "-" * 48)
-        print("CONSERVATION INFORMATION")
+            note("No photographs available.")
 
+        section("Conservation information")
         listings = get_conservation_status(animal.id)
-
         if not listings:
-            print("Conservation listing: Not available")
-            print("This does not mean the species is safe.")
-
+            detail("Conservation listing", "Not available")
+            note("This does not mean the species is safe.")
         else:
             for listing in listings:
                 code = listing["code"]
                 name = listing["name"]
-
                 if listing["threatened"]:
-                    print("\n!!! THREATENED SPECIES !!!")
+                    note("!!! THREATENED SPECIES !!!")
                 elif code == "NT":
-                    print("\n! NEAR THREATENED !")
+                    note("! NEAR THREATENED !")
                 elif code in ("EW", "EX"):
-                    print("\n!!! EXTINCTION STATUS !!!")
+                    note("!!! EXTINCTION STATUS !!!")
+                detail("Status", f"{name} ({code})")
+                detail("Authority", listing["authority"])
+                detail("Scope", listing["region"])
+                print()
 
-                print(f"\nStatus: {name} ({code})")
-                print(f"Authority: {listing['authority']}")
-                print(f"Scope: {listing['region']}")
+        section("Population")
+        detail("Population trend", "Not available")
 
-        print("\nPopulation trend: Not available")
-        print("Habitat and ecology: See More About This Species")
+        section("Habitat and ecology")
+        note("See More About This Species")
 
-        print("Observation counts are not global population estimates.")
+        section("Important note")
+        note("Observation counts are not global population estimates.")
+        print()
         selected = select_menu("Species options", [
             ("Browse observations for this species", "observations"),
             ("More About This Species", "information"),
@@ -288,14 +305,13 @@ def view_field_guide_species(observations):
         ])
         if selected is None:
             return
-
         if selected == "observations":
             browse_observations(observations)
-
         elif selected == "information":
             clear_screen()
             display_species_info(animal)
             pause()
+
 
 def view_species_profile(animal_id, sightings):
     clear_screen()
@@ -306,13 +322,13 @@ def view_species_profile(animal_id, sightings):
         pause()
         return
     animal = species_sightings[0].animal
-    print(f"\nAnimal: {animal.name}")
+    section("Species identity")
+    detail("Animal", animal.name)
     print(f"Scientific name: {animal.scientific_name}")
     print(f"Taxonomic rank: {animal.rank}")
     print(f"Animal ID: {animal.id}")
     print(f"Times recorded: {len(species_sightings)}")
-    print("\n" + "-" * 48)
-    print("SIGHTING HISTORY")
+    section("Sighting history")
     for number, sighting in enumerate(species_sightings, start=1):
         print(f"\nSighting {number}")
         print(f"Date: {sighting.date}")
@@ -334,7 +350,8 @@ def view_discoveries(player, sightings):
     while True:
         clear_screen()
         heading("MY DISCOVERED SPECIES")
-        print(f"\nLifetime species discovered: {len(player.discovered_species)}")
+        section("Discovery totals")
+        detail("Lifetime species discovered", len(player.discovered_species))
         print(f"Species with saved sightings: {len(collection)}")
         if not collection:
             print("\nNo discovered species with saved sightings.")
@@ -361,19 +378,20 @@ def view_wildlife_statistics(player, sightings):
             species_counts[animal_id] = {"name": sighting.animal.name, "count": 0}
         species_counts[animal_id]["count"] += 1
         date_counts[sighting.date] = date_counts.get(sighting.date, 0) + 1
-    print(f"\nPlayer: {player.username}")
+    section("Player")
+    detail("Player", player.username)
     print(f"Level: {player.level} | XP: {player.xp}/100")
-    print("-" * 48)
+    section("Collection totals")
     print(f"Total saved sightings: {len(sightings)}")
     print(f"Unique species recorded: {len(species_counts)}")
     print(f"Lifetime species discovered: {len(player.discovered_species)}")
     if sightings:
         ranked = sorted(species_counts.values(), key=lambda item: item["count"], reverse=True)
-        print("\nTOP 5 MOST RECORDED SPECIES")
+        section("Top 5 most recorded species")
         for number, species in enumerate(ranked[:5], start=1):
             print(f"{number}. {species['name']} - {species['count']} sightings")
         busiest_date = max(date_counts, key=date_counts.get)
-        print("\nEXPLORATION ACTIVITY")
+        section("Exploration activity")
         print(f"Most recorded animal: {ranked[0]['name']}")
         print(f"Busiest sighting date: {busiest_date}")
         print(f"Sightings on that date: {date_counts[busiest_date]}")
@@ -402,12 +420,15 @@ def view_sightings(manager):
         if sighting is not None:
             clear_screen()
             heading("MY SIGHTING DETAILS")
-            print(f"\nID: {sighting.sighting_id}")
+            section("Sighting identity")
+            detail("ID", sighting.sighting_id)
             print(f"Animal: {sighting.animal.name}")
             print(f"Scientific name: {sighting.animal.scientific_name}")
-            print(f"Date: {sighting.date}")
+            section("Sighting details")
+            detail("Date", sighting.date)
             print(f"Coordinates: {sighting.latitude}, {sighting.longitude}")
-            print(f"Image: {sighting.image or 'None'}")
+            section("Additional information")
+            detail("Image", sighting.image or "None")
             print(f"Notes: {sighting.notes or 'None'}")
             pause()
 
@@ -526,10 +547,11 @@ def delete_sighting(manager):
 def view_player_profile(player, manager):
     clear_screen()
     heading("PLAYER PROFILE")
-    print(f"\nUsername: {player.username}")
+    section("Player")
+    detail("Username", player.username)
     print(f"Level: {player.level}")
     print(f"XP: {player.xp}/100")
-    print("-" * 48)
+    section("Discovery statistics")
     print(f"Species Discovered: {len(player.discovered_species)}")
     print(f"Total Saved Sightings: {len(manager.sightings)}")
     pause()
