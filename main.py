@@ -10,6 +10,7 @@ from player_manager import PlayerManager
 from locations import LOCATIONS
 from inaturalistAPI import fetch_observations, search_species, generate_map
 from conservation import get_conservation_status
+from species_info import display_species_info
 
 
 def clear_screen():
@@ -189,7 +190,7 @@ def wildlife_field_guide(observations):
         options.extend([
             ("Search species", "__search__"),
             ("Filter animal group", "__group__"),
-            ("Sort species", "__sort__"),
+            ("Sort species", "__sort__"),  
             ("Reset filters", "__reset__"),
             ("Back to Explore", None),
         ])
@@ -277,18 +278,24 @@ def view_field_guide_species(observations):
                 print(f"Scope: {listing['region']}")
 
         print("\nPopulation trend: Not available")
-        print("Habitat and ecological role: Not yet integrated")
+        print("Habitat and ecology: See More About This Species")
 
         print("Observation counts are not global population estimates.")
         selected = select_menu("Species options", [
             ("Browse observations for this species", "observations"),
+            ("More About This Species", "information"),
             ("Back to Field Guide", None),
         ])
         if selected is None:
             return
+
         if selected == "observations":
             browse_observations(observations)
 
+        elif selected == "information":
+            clear_screen()
+            display_species_info(animal)
+            pause()
 
 def view_species_profile(animal_id, sightings):
     clear_screen()
