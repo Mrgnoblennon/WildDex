@@ -58,5 +58,17 @@
         "latitude": 12.0,
         "longitude": 32.0,
         "notes": "Run!!"
+    },
+    {
+        "id": 6,
+        "animal_id": 69,
+        "animal_name": "Kong",
+        "scientific_name": "Giant Ape",
+        "rank": "species",
+        "image": "kong.jpg",
+        "date": "2000-12-04",
+        "latitude": 12.0,
+        "longitude": 32.0,
+        "notes": ""
     }
 ]

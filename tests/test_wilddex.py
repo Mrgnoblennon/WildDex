@@ -349,6 +349,58 @@ class TestINaturalistAPI(unittest.TestCase):
         )
 
 
+class TestJSONReliability(unittest.TestCase):
+
+    def setUp(self):
+        # use temporary files to protect real player data
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.folder = Path(self.temp_dir.name)
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def test_failed_player_save(self):
+        from player_manager import PlayerManager
+
+        manager = PlayerManager.__new__(PlayerManager)
+        manager.player = Player("Explorer")
+
+        # invalid destination causes saving to fail
+        manager.file_path = self.folder / "missing" / "player.json"
+
+        result = manager.save_player()
+
+        self.assertFalse(result)
+
+    def test_corrupted_player_json(self):
+        from player_manager import PlayerManager
+
+        file_path = self.folder / "player.json"
+        file_path.write_text("{invalid json")
+
+        manager = PlayerManager.__new__(PlayerManager)
+        manager.file_path = file_path
+
+        player = manager.load_player()
+
+        # corrupted data should return a default player
+        self.assertEqual(player.username, "Explorer")
+        self.assertEqual(player.xp, 0)
+        self.assertEqual(player.level, 1)
+
+    def test_corrupted_sightings_json(self):
+        file_path = self.folder / "sightings.json"
+        file_path.write_text("{invalid json")
+
+        manager = WildDexManager.__new__(WildDexManager)
+        manager.file_path = file_path
+        manager.sightings = []
+
+        manager.load_sightings()
+
+        # corrupted data should not create sightings
+        self.assertEqual(manager.sightings, [])
+
 
 if __name__ == "__main__":
     unittest.main()

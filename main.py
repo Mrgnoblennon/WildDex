@@ -150,18 +150,32 @@ def main():
                         notes
                     )
 
-                    # add the sighting and award XP only if it was saved
-                    previous_count = len(manager.sightings)
 
-                    manager.add_sighting(sighting)
+                    # add the sighting and check if it saved
+                    if manager.add_sighting(sighting):
 
-                    if len(manager.sightings) > previous_count:
-                        player_manager.player.discover_animal(animal)
+                        # remember player progress before awarding XP
+                        player = player_manager.player
 
+                        previous_xp = player.xp
+                        previous_level = player.level
+                        previous_discoveries = player.discovered_species.copy()
+
+                        # award XP for discovering an animal
+                        player.discover_animal(animal)
+
+                        # save updated player progress
                         if player_manager.save_player():
                             print("Player progress saved!")
+
                         else:
+                            # restore progress if saving fails
+                            player.xp = previous_xp
+                            player.level = previous_level
+                            player.discovered_species = previous_discoveries
+
                             print("Warning: Player progress could not be saved.")
+
             except ValueError:
                 print("\nInvalid input. Check your numbers and date format.")
         
