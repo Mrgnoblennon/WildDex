@@ -127,7 +127,7 @@ def generate_map(observations):
         ).add_to(wildlife_map)
 
     # save map as HTML
-    wildlife_map.save("wilddex_map.html")
+    wildlife_map.save("generated/wilddex_map.html")
 
     print("WildDex map generated successfully!")
 

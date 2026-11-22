@@ -2,6 +2,8 @@
 # library imports
 import json
 from pathlib import Path
+import math
+from datetime import date
 
 # import my local classes
 from animal import Animal
@@ -19,17 +21,65 @@ class WildDexManager:
         # load previously saved sightings
         self.load_sightings()
 
-    def add_sighting(self, sighting):
+
+    def validate_sighting(self, sighting):
         # check that the object is a Sighting
         if not isinstance(sighting, Sighting):
-            print("Invalid sighting.")
-            return
+            return False
+
+        # check required animal information
+        if not isinstance(sighting.animal, Animal):
+            return False
+
+        if not isinstance(sighting.animal.name, str):
+            return False
+
+        if not sighting.animal.name.strip():
+            return False
+
+        if not isinstance(sighting.animal.scientific_name, str):
+            return False
+
+        if not sighting.animal.scientific_name.strip():
+            return False
+
+        # check date format
+        try:
+            date.fromisoformat(sighting.date)
+        except (ValueError, TypeError):
+            return False
+
+        # check coordinates
+        try:
+            latitude = float(sighting.latitude)
+            longitude = float(sighting.longitude)
+        except (ValueError, TypeError):
+            return False
+
+        if not math.isfinite(latitude) or not math.isfinite(longitude):
+            return False
+
+        if not -90 <= latitude <= 90:
+            return False
+
+        if not -180 <= longitude <= 180:
+            return False
+
+        return True
+
+
+
+    def add_sighting(self, sighting):
+        # validate sighting information
+        if not self.validate_sighting(sighting):
+            print("Invalid sighting information.")
+            return False
 
         # check for duplicate sighting IDs
         for existing in self.sightings:
             if existing.sighting_id == sighting.sighting_id:
                 print("A sighting with this ID already exists.")
-                return
+                return False
 
         # add sighting to the collection
         self.sightings.append(sighting)
@@ -37,9 +87,12 @@ class WildDexManager:
         # save updated collection
         if self.save_sightings():
             print("Sighting added successfully!")
-        else:
-            self.sightings.remove(sighting)
-            print("Sighting was not added.")
+            return True
+
+        # restore the collection if saving fails
+        self.sightings.remove(sighting)
+        print("Sighting was not added.")
+        return False
 
     def view_sightings(self):
         # check if there are any sightings
@@ -54,12 +107,13 @@ class WildDexManager:
             print(sighting.get_info())
 
     
+
     def edit_sighting(self, sighting_id, updates):
         # find the sighting using its ID
         for sighting in self.sightings:
             if sighting.sighting_id == sighting_id:
 
-                # save original values in case saving fails
+                # save original values in case validation or saving fails
                 original = {
                     "animal_name": sighting.animal.name,
                     "scientific_name": sighting.animal.scientific_name,
@@ -70,31 +124,42 @@ class WildDexManager:
                     "notes": sighting.notes
                 }
 
-                # update the selected fields
-                for field, value in updates.items():
-                    if field in ("animal_name", "scientific_name"):
-                        attribute = (
-                            "name" if field == "animal_name"
-                            else "scientific_name"
-                        )
-                        setattr(sighting.animal, attribute, value)
+                # only allow supported fields
+                if not isinstance(updates, dict):
+                    print("Invalid updates.")
+                    return False
 
-                    elif field in original:
+                if any(field not in original for field in updates):
+                    print("Invalid update field.")
+                    return False
+
+                # apply requested changes
+                for field, value in updates.items():
+                    if field == "animal_name":
+                        sighting.animal.name = value
+
+                    elif field == "scientific_name":
+                        sighting.animal.scientific_name = value
+
+                    else:
                         setattr(sighting, field, value)
 
-                # save changes to JSON
-                if self.save_sightings():
-                    print("Sighting updated successfully!")
-                    return True
+                # validate updated sighting
+                if self.validate_sighting(sighting):
+                    if self.save_sightings():
+                        print("Sighting updated successfully!")
+                        return True
 
-                # restore original values if saving fails
+                # restore original values if validation or saving fails
                 sighting.animal.name = original["animal_name"]
                 sighting.animal.scientific_name = original["scientific_name"]
 
-                for field in ("image", "date", "latitude", "longitude", "notes"):
+                for field in (
+                    "image", "date", "latitude", "longitude", "notes"
+                ):
                     setattr(sighting, field, original[field])
 
-                print("Unable to update sighting.")
+                print("Invalid changes or unable to save sighting.")
                 return False
 
         print("Sighting not found.")
