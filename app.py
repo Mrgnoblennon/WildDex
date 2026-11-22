@@ -21,7 +21,7 @@ def home():
 # display Folium map
 @app.route("/map")
 def wildlife_map():
-    map_file = os.path.join(app.root_path, "wilddex_map.html")
+    map_file = os.path.join(app.root_path, "generated/wilddex_map.html")
 
     if not os.path.exists(map_file):
         return "Map not found. Run inaturalistAPI.py first.", 404

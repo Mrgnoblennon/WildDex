@@ -126,6 +126,43 @@ def browse_observations(observations):
             pause()
 
 
+def view_discoveries(player, sightings):
+    clear_screen()
+    heading("MY DISCOVERED SPECIES")
+
+    # store species information using animal IDs
+    collection = {}
+
+    for sighting in sightings:
+        animal = sighting.animal
+
+        # only include species the player has discovered
+        if animal.id in player.discovered_species:
+
+            if animal.id not in collection:
+                collection[animal.id] = {
+                    "name": animal.name,
+                    "scientific_name": animal.scientific_name,
+                    "count": 0
+                }
+
+            collection[animal.id]["count"] += 1
+
+    print(f"\nSpecies discovered: {len(player.discovered_species)}")
+    print(f"Species with saved sightings: {len(collection)}")
+    print("-" * 45)
+
+    if not collection:
+        print("No discovered species with saved sightings.")
+        return
+
+    for number, species in enumerate(collection.values(), start=1):
+        print(f"\n{number}. {species['name']}")
+        print(f"   Scientific name: {species['scientific_name']}")
+        print(f"   Times recorded: {species['count']}")
+
+    print("\n" + "-" * 45)
+
 
 def main():
     # store observations retrieved from iNaturalist
@@ -149,6 +186,7 @@ def main():
         print("  7. Edit a sighting")
         print("  8. View Player Profile")
         print("  9. Browse wildlife observations")
+        print("  10. View Discovered Species")
         print("  0. Exit")
 
         print("-" * 45)
@@ -437,6 +475,12 @@ def main():
 
         elif choice == "9":
             browse_observations(observations)
+
+        elif choice == "10":
+            view_discoveries(
+                player_manager.player,
+                manager.sightings
+            )
 
         elif choice == "0":
             print("Goodbye!")

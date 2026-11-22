@@ -1,13 +1,15 @@
 {
-    "username": "Chase",
-    "level": 4,
-    "xp": 10,
+    "username": "WildDexTester",
+    "level": 5,
+    "xp": 35,
     "discovered_species": [
-        69,
-        12312412,
+        123,
         456,
         789,
-        123,
-        12124
+        1004,
+        1005,
+        1006,
+        1007,
+        1008
     ]
 }
